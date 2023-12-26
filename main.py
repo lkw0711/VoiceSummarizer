@@ -32,11 +32,11 @@ def extract_key_points(text):
         model="gpt-3.5-turbo-1106",
         messages=[
             {"role": "system", "content": "You will be provided with an audio transcript, and your task is to summarize the key points"},
-            {"role": "user", "content":  f"{text}"}
+            {"role": "user", "content": text}
         ],
         max_tokens=150
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 
 def voicesummarizer(audio_file):
@@ -60,5 +60,4 @@ app = gr.Interface(
 )
 
 if __name__ == "__main__":
-    app.launch()
-# share=True
+    app.launch(share=True)
