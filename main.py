@@ -18,31 +18,33 @@ client = OpenAI(
 
 
 def transcribe_audio(audio_file):
-    with open(audio_file.name, 'rb') as f:
+    with open(audio_file, 'rb') as f:
         transcript = client.audio.transcriptions.create(
             model="whisper-1",
             file=f,
             response_format="text"
         )
-    return transcript['data']['text']
+    return transcript
 
 
 def extract_key_points(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        prompt=f"Summarize the key points: {text}",
+        model="gpt-3.5-turbo-1106",
+        messages=[
+            {"role": "system", "content": "You will be provided with an audio transcript, and your task is to summarize the key points"},
+            {"role": "user", "content":  f"{text}"}
+        ],
         max_tokens=150
     )
-    return response['choices'][0]['text']
+    return response['choices'][0]['message']['content']
 
 
 def voicesummarizer(audio_file):
     # 調用 transcribe_audio 和 extract_key_points
     transcribed_text = transcribe_audio(audio_file)
-    # key_points = extract_key_points(transcribed_text)
+    key_points = extract_key_points(transcribed_text)
 
-    return transcribed_text
-# , key_points
+    return transcribed_text, key_points
 
 
 # 創建 gradio 界面
@@ -51,7 +53,7 @@ app = gr.Interface(
     inputs=input_audio,
     outputs=[
         gr.Textbox(label="Transcribed Text"),
-        # gr.Textbox(label="Key Points")
+        gr.Textbox(label="Key Points")
     ],
     title="VoiceSummarizer - Audio to Summary",
     description="Upload your audio file and get a transcribed text along with its key points."
