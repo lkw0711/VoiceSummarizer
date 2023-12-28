@@ -1,21 +1,16 @@
 import gradio as gr
 import os
-import tempfile
 from openai import OpenAI
 
-
-tempfile.tempdir = ".\\tmp"
-if not os.path.exists(tempfile.tempdir):
-    os.makedirs(tempfile.tempdir)
 
 input_audio = gr.Audio(sources=["upload", "microphone"],
                        type="filepath", format="mp3", label="Upload Audio File")
 input_language = gr.Dropdown(
-    choices=[["中文", "zh"], ["English", "en"]], label="Audio_language")
+    choices=[["中文", "zh"], ["English", "en"]], label="Audio_language", value="zh")
 key_points_prompt = gr.Textbox(value="",
                                placeholder="to summarize the key points")
 output_language = gr.Dropdown(
-    choices=[["中文", "繁體中文"], ["English", "English"]], label="key_points_language")
+    choices=[["中文", "繁體中文"], ["English", "English"]], label="key_points_language", value="繁體中文")
 client = OpenAI(
     api_key="sess-YiinApevNVx19Audctze9DzuE3yLe04PvtcNGSf5"
 )
@@ -37,7 +32,7 @@ def extract_key_points(text, language, prompt):
         model="gpt-3.5-turbo-1106",
         messages=[
             {"role": "system",
-                "content": f"You will be provided with an audio transcription, and your task is to summarize the key points, and {prompt}, with {language}"},
+                "content": f"You will be provided with an audio transcription, and your task is to summarize the key points and {prompt}, with {language}"},
             {"role": "user", "content": f"{text}"}
         ],
         max_tokens=150
@@ -66,4 +61,4 @@ app = gr.Interface(
 
 if __name__ == "__main__":
     app.launch()
-    # share=True)
+        # share=True
